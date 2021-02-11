@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Counter from "./Counter";
+import { inc, dec, removeFromCart } from "../store/action/product";
+import { useDispatch } from "react-redux";
 
 const Card = styled.div`
   display: flex;
@@ -30,17 +32,35 @@ const Price = styled.div`
   text-align: center;
 `;
 
-const CardItem = () => {
+const CardItem = ({ item }) => {
   const [count, setCount] = useState(1);
+  const dispatch = useDispatch();
+
+  const increment = (id) => {
+    setCount(count + 1);
+    dispatch(inc(id));
+  };
+
+  const decrement = (id) => {
+    setCount(count - 1);
+    if (count > 1) {
+      dispatch(dec(id));
+    } else {
+      if (count === 1) {
+        dispatch(removeFromCart(id));
+      }
+    }
+  };
+
   return (
     <Card>
-      <ItemName>Nama</ItemName>
+      <ItemName>{item.name}</ItemName>
       <CounterContainer>
-        <Counter inc />
+        <Counter inc={() => increment(item.id)} />
         <CounterTotal>{count}</CounterTotal>
-        <Counter />
+        <Counter dec={() => decrement(item.id)} />
       </CounterContainer>
-      <Price>50.000</Price>
+      <Price>{item.price}</Price>
     </Card>
   );
 };
